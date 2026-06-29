@@ -1,13 +1,6 @@
-# 🚀 Retail Data Engineering Pipeline using dbt & Snowflake
+# 🚀 Retail Data Engineering Pipeline with dbt Core & Snowflake
 
 > Production-style Analytics Engineering project implementing the Medallion Architecture (Bronze → Silver → Gold) using dbt Core, Snowflake, SQLFluff, snapshots, incremental models, reusable macros, and automated data quality testing.
-![dbt](https://img.shields.io/badge/dbt-Core-orange)
-![Snowflake](https://img.shields.io/badge/Snowflake-Data_Warehouse-blue)
-![SQL](https://img.shields.io/badge/SQL-Snowflake-blue)
-![Python](https://img.shields.io/badge/Python-3.13-yellow)
-![SQLFluff](https://img.shields.io/badge/SQLFluff-Linting-green)
-![Git](https://img.shields.io/badge/Git-Version_Control-red)
-![GitHub](https://img.shields.io/badge/GitHub-Portfolio-black)
 
 ---
 
@@ -335,19 +328,6 @@ Custom Jinja macros are used to eliminate repetitive SQL logic.
 | calculate_revenue | Calculates total revenue from quantity × price |
 
 Using macros improves consistency and simplifies maintenance across multiple models.
----
-
-# 🎯 dbt Selectors
-
-Selectors are configured to simplify execution of specific groups of models.
-
-Examples include:
-
-- Gold models
-- Silver models
-- Staging models
-
-This improves developer productivity by allowing targeted pipeline execution.
 ---
 
 # 🎯 dbt Selectors
