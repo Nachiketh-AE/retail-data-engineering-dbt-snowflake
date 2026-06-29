@@ -1,0 +1,29 @@
+version: 2
+
+exposures:
+
+  - name: executive_dashboard
+    label: Executive Retail Dashboard
+    type: dashboard
+
+    maturity: high
+
+    url: https://app.powerbi.com/
+
+    description: |
+      Executive Power BI dashboard used by business stakeholders
+      to monitor sales, customers and product performance.
+
+    depends_on:
+      - ref('daily_sales')
+      - ref('monthly_sales')
+      - ref('category_sales')
+      - ref('customer_summary')
+      - ref('product_performance')
+      - ref('top_customers')
+      - ref('customer_segmentation')
+      - ref('executive_dashboard')
+
+    owner:
+      name: Smriti Jha
+      email: smriti@example.com

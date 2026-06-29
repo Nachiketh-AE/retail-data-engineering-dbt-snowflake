@@ -1,0 +1,46 @@
+name: 'retail_etl'
+version: '1.0.0'
+config-version: 2
+
+profile: 'retail_etl'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+
+  retail_etl:
+
+    staging:
+      +materialized: view
+      +tags:
+        - staging
+
+    silver:
+      +materialized: view
+      +tags:
+        - silver
+
+    gold:
+      +materialized: table
+      +tags:
+        - gold
+
+snapshots:
+
+  retail_etl:
+    +target_schema: snapshots
+
+seeds:
+
+  retail_etl:
+    +quote_columns: false
