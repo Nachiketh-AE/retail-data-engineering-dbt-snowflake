@@ -1,475 +1,314 @@
-# 🚀 Retail Data Engineering Pipeline with dbt Core & Snowflake
+# Retail Data Engineering Pipeline with dbt Core & Snowflake
 
-> Production-style Analytics Engineering project implementing the Medallion Architecture (Bronze → Silver → Gold) using dbt Core, Snowflake, SQLFluff, snapshots, incremental models, reusable macros, and automated data quality testing.
+A portfolio project demonstrating a retail ELT pipeline using **dbt Core, Snowflake SQL, and the Medallion Architecture**. The project transforms raw retail data into analytics-ready models and includes reusable macros, incremental processing, snapshots, and automated data quality tests.
 
----
+> **Project status:** Core dbt pipeline successfully built and tested using synthetic retail sample data. This is an educational portfolio project, not a production deployment.
 
-![dbt](https://img.shields.io/badge/dbt-Core-orange?logo=dbt)
-![Snowflake](https://img.shields.io/badge/Snowflake-Cloud-blue?logo=snowflake)
-![SQL](https://img.shields.io/badge/SQL-Snowflake-blue)
-![Python](https://img.shields.io/badge/Python-3.13-yellow?logo=python)
-![SQLFluff](https://img.shields.io/badge/SQLFluff-Linting-success)
-![Status](https://img.shields.io/badge/Project-Completed-brightgreen)
-![License](https://img.shields.io/badge/License-MIT-green)
+## Project Overview
 
-</div>
+Retail analytics teams need reliable, consistent data to understand sales trends, customer behavior, and product performance. This project demonstrates how raw customer, product, and transaction tables can be transformed into structured datasets for downstream reporting.
 
----
+The pipeline follows a Bronze → Staging → Silver → Gold workflow, with dbt managing SQL transformations, dependencies, and data quality tests.
 
-## 📌 Project Overview
+### Key Features
 
-This project demonstrates the design and implementation of a modern analytics engineering workflow using **dbt Core** and **Snowflake**. It transforms raw retail transaction data into clean, analytics-ready datasets through a modular ELT pipeline.
+- Medallion-style data architecture
+- Snowflake as the cloud data warehouse
+- Modular SQL models managed with dbt Core
+- Reusable Jinja macros
+- Incremental model with merge strategy
+- dbt snapshot for historical tracking
+- Automated data quality tests
+- dbt-utils package
+- Git-based version control
 
-The project follows software engineering best practices including reusable SQL, automated data quality testing, incremental processing, snapshot-based history tracking, SQL linting, and version-controlled transformations.
-
-The primary objective is to showcase production-oriented data engineering practices rather than simply building reporting tables.
-
----
-## 📸 Project Preview
-### 📈 dbt Model Lineage
-
-This lineage graph illustrates how raw retail data flows through the Medallion Architecture—from Bronze sources to Silver transformations and Gold business-ready models—using dbt's dependency graph.
-
-![dbt Lineage](assets/screenshots/dbt_lineage.png)
-
----
-
-### ✅ Successful dbt Run
-
-![dbt Run](assets/screenshots/dbt_run.png)
-
-### ✅ Data Quality Tests
-
-![dbt Test](assets/screenshots/dbt_test.png)
-
-# 📚 Table of Contents
-
-- [Project Architecture](#-project-architecture)
-- [Technology Stack](#-technology-stack)
-- [Project Structure](#-project-structure)
-- [Data Pipeline](#-data-pipeline)
-- [Bronze Layer](#-bronze-layer)
-- [Staging Layer](#-staging-layer)
-- [Silver Layer](#-silver-layer)
-- [Gold Layer](#-gold-layer)
-- [Incremental Processing](#-incremental-processing)
-- [Snapshots](#-snapshots)
-- [Data Quality Testing](#-data-quality-testing)
-- [SQLFluff Integration](#-sqlfluff-integration)
-- [Packages Used](#-packages-used)
-- [How to Run](#-how-to-run)
-- [Project Metrics](#-project-metrics)
-- [Known Limitations](#-known-limitations)
-- [Future Enhancements](#-future-enhancements)
----
-
-# 🏗️ Project Architecture
+## Architecture
 
 ```mermaid
-flowchart LR
+flowchart TD
+    A[Raw Retail Tables in Snowflake] --> B[Staging Views]
+    B --> C[Silver: Cleaned Data]
+    C --> D[Gold: Analytics Models]
+    D --> E[Reporting and Business Intelligence]
 
-A[Raw CSV Data] --> B[Snowflake Bronze Layer]
-
-B --> C[dbt Staging Models]
-
-C --> D[Silver Layer]
-
-D --> E[Gold Analytics Layer]
-
-E --> F[Business Reports & Dashboards]
+    F[dbt Tests] -. Validate .-> B
+    F -. Validate .-> C
+    F -. Validate .-> D
 ```
----
 
-# 💻 Technology Stack
+## Technology Stack
 
 | Category | Technology |
-|----------|------------|
-| Data Warehouse | Snowflake |
+|---|---|
+| Data warehouse | Snowflake |
 | Transformation | dbt Core |
-| SQL Dialect | Snowflake SQL |
-| Programming | Python 3.13 |
-| Data Modeling | Bronze → Silver → Gold |
-| Version Control | Git & GitHub |
-| Data Quality | dbt Tests |
-| Historical Tracking | dbt Snapshots |
-| Incremental Processing | dbt Incremental Models |
-| Reusable Logic | Jinja Macros |
-| Package | dbt-utils |
-| SQL Style Enforcement | SQLFluff |
----
+| SQL dialect | Snowflake SQL |
+| Templating | Jinja |
+| Data modeling | Bronze → Silver → Gold |
+| Data quality | dbt tests |
+| Historical tracking | dbt snapshots |
+| Incremental processing | dbt incremental models |
+| Reusable utilities | dbt-utils |
+| SQL linting | SQLFluff configuration included |
+| Version control | Git and GitHub |
 
-# 📁 Project Structure
+## Project Structure
 
 ```text
-retail_etl/
-│
+retail-data-engineering-dbt-snowflake/
 ├── analyses/
-├── dbt_packages/
-├── logs/
+├── assets/
+│   └── screenshots/
 ├── macros/
 │   └── calculate_revenue.sql
-│
 ├── models/
 │   ├── staging/
 │   ├── silver/
 │   ├── gold/
-│   └── sources.yml
-│
+│   ├── schema.yml
+│   ├── sources.yml
+│   └── exposures.yml
 ├── seeds/
 ├── snapshots/
-├── target/
 ├── tests/
-│
 ├── dbt_project.yml
 ├── packages.yml
-├── selectors.yml
 ├── requirements.txt
+├── selectors.yml
 ├── .sqlfluff
+├── .gitignore
 └── README.md
 ```
----
 
-# 🔄 Data Pipeline
+Generated folders such as `target/`, `logs/`, `dbt_packages/`, and the local virtual environment may be created while working with the project.
 
-The project follows the Medallion (Bronze → Silver → Gold) architecture to progressively improve data quality and prepare datasets for analytics.
+## Data Architecture
 
-```text
-Raw CSV Files
-      │
-      ▼
-Snowflake Bronze Tables
-      │
-      ▼
-dbt Staging Models
-      │
-      ▼
-Silver Business Models
-      │
-      ▼
-Gold Analytics Models
-      │
-      ▼
-Business Intelligence / Dashboards
-```
+### 1. Bronze — Raw Data
 
-Each layer has a single responsibility, making the pipeline modular, maintainable, and scalable.
----
+The Bronze layer contains the source tables in Snowflake's `BRONZE` schema.
 
-# 🥉 Bronze Layer
+| Source table | Description |
+|---|---|
+| `RAW_CUSTOMER` | Customer attributes and purchase counts |
+| `RAW_PRODUCT` | Product details, prices, inventory, and ratings |
+| `RAW_ORDERS` | Transactions, quantities, amounts, and transaction dates |
 
-### Purpose
+The current development environment uses **synthetic sample data** created for testing. The project does not currently provide an automated ingestion pipeline that loads external retail CSV files into Bronze.
 
-The Bronze layer stores raw retail data exactly as received from the source system with minimal transformation.
+### 2. Staging — Source Preparation
 
-### Source Tables
+Staging models provide a consistent interface to the raw tables.
 
-| Table | Description |
-|--------|-------------|
-| RAW_CUSTOMER | Customer master data |
-| RAW_PRODUCT | Product catalog |
-| RAW_ORDERS | Retail transaction data |
+- `stg_customer`
+- `stg_product`
+- `stg_orders`
 
-### Design Principles
+These models are implemented as Snowflake views.
 
-- Preserve raw source data
-- No business logic applied
-- Acts as the system of record
-- Supports reproducibility and auditing
----
+### 3. Silver — Cleaned Data
 
-# 🏗️ Staging Layer
-
-The staging layer standardizes raw source data before business transformations.
-
-### Responsibilities
-
-- Rename columns
-- Apply consistent naming conventions
-- Standardize data types
-- Prepare clean inputs for downstream models
-
-### Models
-
-- stg_customer
-- stg_product
-- stg_orders
----
-
-# 🥈 Silver Layer
-
-The Silver layer contains cleaned and business-ready datasets.
-
-### Models
-
-- customer
-- product
-- orders
-
-### Responsibilities
-
-- Data cleansing
-- Business rule implementation
-- Standardized dimensions
-- Reusable analytical datasets
----
-
-# 🥇 Gold Layer
-
-The Gold layer provides analytics-ready models optimized for reporting and business intelligence.
-
-### Analytical Models
+The Silver layer contains three models:
 
 | Model | Purpose |
-|--------|----------|
-| daily_sales | Daily sales reporting |
-| monthly_sales | Monthly business trends |
-| category_sales | Category-level revenue analysis |
-| customer_summary | Customer purchasing behavior |
-| customer_segmentation | Customer segmentation |
-| product_performance | Product performance metrics |
-| top_customers | High-value customer analysis |
-| executive_dashboard | Executive KPI reporting |
-| incremental_sales | Incremental transaction processing |
+|---|---|
+| `customer` | Standardizes customer attributes and applies basic validation |
+| `product` | Standardizes product categories and price types |
+| `orders` | Prepares transaction records for analytics |
 
-These models are designed to serve dashboards, reporting tools, and business stakeholders.
----
+These models provide reusable, cleaned inputs for downstream business transformations.
 
-# ⚡ Incremental Processing
+### 4. Gold — Analytics
 
-To improve performance and reduce processing time, the project includes an **incremental dbt model**.
+The Gold layer contains nine analytical models.
 
-### Objective
+| Model | Business purpose |
+|---|---|
+| `daily_sales` | Daily sales metrics |
+| `monthly_sales` | Monthly sales trends |
+| `category_sales` | Sales by product category |
+| `customer_summary` | Customer purchasing summaries |
+| `customer_segmentation` | Customer value segments |
+| `product_performance` | Product-level sales metrics |
+| `top_customers` | Ranking customers by value |
+| `executive_dashboard` | Consolidated business KPIs |
+| `incremental_sales` | Incrementally maintained transaction analytics |
 
-Instead of rebuilding the entire transaction table on every execution, only newly arrived records are processed.
+These models are designed to support reporting and downstream business intelligence.
 
-### Configuration
+## Incremental Processing
 
-- Materialization: `incremental`
-- Strategy: `merge`
-- Unique Key: `transaction_id`
+The `incremental_sales` model demonstrates incremental processing using dbt's incremental materialization.
 
-### Benefits
+| Setting | Value |
+|---|---|
+| Materialization | Incremental |
+| Strategy | Merge |
+| Unique key | `transaction_id` |
 
-- Faster execution
-- Reduced warehouse compute cost
-- Production-friendly design
-- Scalable for large datasets
----
+The model uses transaction dates to identify records newer than the latest date already processed. This demonstrates a basic incremental pattern.
 
-# 📸 Snapshot Management
+**Limitation:** A date-based filter can miss late-arriving or corrected records with older transaction dates. Production implementations should account for late-arriving data, updates, and backfills.
 
-The project uses **dbt Snapshots** to preserve historical changes in customer data.
+## Snapshot Management
 
-### Snapshot Strategy
+The project includes a dbt snapshot for historical tracking.
 
-- Timestamp-based tracking
-- Historical record preservation
-- Slowly Changing Dimension (SCD Type 2) approach
+Snapshots can preserve changes to source records over time and support slowly changing dimension (SCD Type 2) analysis, depending on the configured snapshot strategy.
 
-### Benefits
+The snapshot has been executed successfully in the development environment.
 
-- Historical reporting
-- Audit capability
-- Customer history analysis
----
+## Data Quality Testing
 
-# ✅ Data Quality Testing
+The project defines dbt tests for key data integrity rules, including:
 
-Data quality is validated using built-in dbt tests.
+- Unique identifiers
+- Non-null required fields
+- Relationships between orders, customers, and products
 
-### Tests Implemented
+The configured data tests have been executed successfully against the synthetic development dataset.
 
-- Not Null
-- Unique
-- Relationships
-- Accepted Values
+## Reusable Macros and Packages
 
-### Purpose
+### `calculate_revenue`
 
-These automated tests ensure that transformed datasets remain reliable and analytics-ready.
----
+A custom Jinja macro used by analytical models to centralize reusable revenue-related SQL logic.
 
-# 🎨 SQL Style Enforcement
+### `dbt-utils`
 
-The project integrates **SQLFluff** to maintain consistent SQL formatting and enforce coding standards.
+The project includes the `dbt-utils` package, which provides reusable utilities for dbt projects.
 
-### Features
+## Validation Results
 
-- Snowflake SQL dialect
-- dbt templater
-- Consistent formatting
-- Readable SQL
-- Automated linting
+The following results were observed during development against the configured Snowflake environment and synthetic sample data.
 
-### Outcome
+| Validation | Result |
+|---|---|
+| `dbt parse` | Successful |
+| `dbt debug` | Successful connection and configuration checks |
+| Staging models | 3 successful |
+| Silver models | 3 successful |
+| Gold models | 9 successful |
+| Configured data tests | 13 passed |
+| Seed execution | 1 successful |
+| Snapshot execution | 1 successful |
+| Full `dbt build` | 30 passed, 0 warnings, 0 errors, 1 no-op |
 
-All project models successfully pass SQLFluff linting, ensuring a clean and maintainable SQL codebase.
----
+These are development validation results, not performance benchmarks or evidence of production deployment. The SQLFluff configuration is included, but a complete successful lint run has not yet been verified.
 
-# 📦 dbt-utils Package
+## Setup and Execution
 
-The project uses the **dbt-utils** package to extend dbt functionality with reusable macros and utilities.
+### Prerequisites
 
-### Benefits
+- Python and pip
+- Git
+- A Snowflake account with permission to create and query the required database objects
+- dbt Core with the Snowflake adapter
 
-- Reusable SQL logic
-- Improved maintainability
-- Community-supported best practices
----
-
-# 🧩 Reusable Macros
-
-Custom Jinja macros are used to eliminate repetitive SQL logic.
-
-### Macro Included
-
-| Macro | Purpose |
-|--------|----------|
-| calculate_revenue | Calculates total revenue from quantity × price |
-
-Using macros improves consistency and simplifies maintenance across multiple models.
----
-
-# 🎯 dbt Selectors
-
-Selectors are configured to simplify execution of specific groups of models.
-
-Examples include:
-
-- Gold models
-- Silver models
-- Staging models
-
-This improves developer productivity by allowing targeted pipeline execution.
----
-
-# ▶️ Running the Project
-
-Clone the repository:
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/dbt-retail-project.git
+git clone https://github.com/nachiii-1705/retail-data-engineering-dbt-snowflake.git
+cd retail-data-engineering-dbt-snowflake
 ```
 
-Navigate into the project:
+### 2. Create and activate a virtual environment
 
-```bash
-cd retail_etl
-```
-
-Create a virtual environment:
-
-```bash
-python -m venv venv
-```
-
-Activate the environment (Windows):
+On Windows PowerShell:
 
 ```powershell
-venv\Scripts\activate
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
-Install dependencies:
+### 3. Install dependencies
 
-```bash
-pip install -r requirements.txt
+```powershell
+python -m pip install -r requirements.txt
 ```
 
-Install dbt packages:
+### 4. Configure Snowflake
 
-```bash
+Configure the `retail_etl` profile in your local `profiles.yml` file, normally located at:
+
+```text
+%USERPROFILE%\.dbt\profiles.yml
+```
+
+Use the profile name specified in `dbt_project.yml`. Configure the Snowflake account, user, authentication method, warehouse, database, schema, and role for your own environment.
+
+**Never commit passwords, private keys, access tokens, or other credentials to GitHub.**
+
+### 5. Prepare the source data
+
+Create and populate the required source tables in the `BRONZE` schema of your configured Snowflake database. The development results documented here used synthetic sample records.
+
+The source tables must exist before the staging models can run. The current repository does not automatically ingest the sample records into Snowflake.
+
+### 6. Install dbt packages and validate the connection
+
+```powershell
 dbt deps
-```
-
-Verify the project:
-
-```bash
 dbt debug
+dbt parse
 ```
 
-Run models:
+### 7. Run the pipeline
 
-```bash
-dbt run
+Run the layers individually:
+
+```powershell
+dbt run --select path:models/staging
+dbt run --select path:models/silver
+dbt run --select path:models/gold
 ```
 
-Execute tests:
+Or execute the configured models, tests, seeds, and snapshots together:
 
-```bash
+```powershell
+dbt build
+```
+
+To run the configured data quality tests separately:
+
+```powershell
 dbt test
 ```
 
-Generate documentation:
+## Known Limitations
 
-```bash
-dbt docs generate
-```
+- The development dataset is synthetic and small.
+- Raw data ingestion is not automated.
+- Source freshness monitoring is not configured because the source tables lack a reliable ingestion timestamp. `transaction_date` represents when an order occurred, not when the record was loaded.
+- The incremental model's date-based filter may miss late-arriving records.
+- SQLFluff linting has not yet been fully validated.
+- The pipeline has been validated in a development Snowflake environment, not a production deployment.
 
-Launch documentation:
+## Future Improvements
 
-```bash
-dbt docs serve
-```
----
+- Add reproducible scripts for creating and loading Bronze tables.
+- Introduce an ingestion timestamp and configure meaningful source freshness checks.
+- Improve incremental processing to handle late-arriving and corrected records.
+- Add more business-rule and edge-case tests.
+- Verify SQLFluff linting and formatting across all project models.
+- Add continuous integration with GitHub Actions.
+- Generate and publish dbt documentation and model lineage.
+- Add a business intelligence dashboard using validated Gold outputs.
+- Document least-privilege Snowflake roles and deployment practices.
 
-# ⭐ Repository Highlights
+## Skills Demonstrated
 
-- Modular Medallion Architecture
-- Snowflake Data Warehouse
-- Incremental Processing
-- Snapshot Management
-- Automated Data Quality Testing
-- SQLFluff Integration
-- Reusable Jinja Macros
-- dbt-utils Package
-- Production-style Project Structure
-- Version Controlled with Git
----
+- SQL and Snowflake
+- dbt Core and Jinja
+- ELT pipeline design
+- Dimensional and analytical data modeling
+- Medallion architecture
+- Incremental transformations
+- Historical data tracking
+- Data quality testing
+- Git and GitHub
+- Analytics engineering
 
-# ⚠️ Known Limitation
+## License and Attribution
 
-The sample retail dataset does **not** include a dedicated ingestion timestamp (for example, `loaded_at` or `ingestion_timestamp`).
-
-Because dbt source freshness is designed to evaluate data recency using a reliable ingestion timestamp, a meaningful freshness check cannot be demonstrated with this dataset.
-
-Source freshness has been configured as part of the project, but the limitation originates from the sample dataset rather than the dbt implementation.
-
-In a production environment, the source tables would typically include an ingestion timestamp populated by the data ingestion process, enabling accurate freshness monitoring.
----
-
-# 🚀 Future Improvements
-
-Possible future enhancements include:
-
-- CI/CD pipeline using GitHub Actions
-- Automated dbt Cloud deployment
-- Great Expectations integration
-- Airflow orchestration
-- Data observability
-- Unit testing
-- Semantic Layer
-- Power BI dashboard integration
----
-
-# 💼 Skills Demonstrated
-
-- Data Engineering
-- dbt Core
-- Snowflake
-- SQL
-- Python
-- Incremental Models
-- Data Warehousing
-- Data Modeling
-- Medallion Architecture
-- Snapshot Management
-- Data Quality Testing
-- SQL Optimization
-- Git
-- GitHub
-- Analytics Engineering
----
-
-# 📄 License
-
-This project is provided for educational and portfolio purposes.
+Refer to the repository's `LICENSE` file for the applicable license and reuse terms. This repository is a portfolio adaptation of an existing project; retain the original author's attribution and applicable license notices when making modifications.
