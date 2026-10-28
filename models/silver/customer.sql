@@ -14,6 +14,6 @@ SELECT
 
     INITCAP(gender) AS gender,
 
-    TRY_TO_NUMBER(total_purchases) AS total_purchases
+    total_purchases AS total_purchases
 
 FROM {{ ref('stg_customer') }}

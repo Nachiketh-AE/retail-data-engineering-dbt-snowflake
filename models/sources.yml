@@ -2,9 +2,7 @@ version: 2
 
 sources:
   - name: bronze
-    description: Bronze layer raw retail tables
-
-    database: PACIFIC_RETAIL_DB
+    database: RETAIL_DBT_DB
     schema: BRONZE
 
     tables:
@@ -16,15 +14,3 @@ sources:
 
       - name: raw_orders
         description: Raw orders table
-
-        config:
-          loaded_at_field: transaction_date
-
-          freshness:
-            warn_after:
-              count: 24
-              period: hour
-
-            error_after:
-              count: 48
-              period: hour
